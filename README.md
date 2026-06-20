@@ -1,226 +1,125 @@
-[Finn No Scraper](https://apify.com/unfenced-group/finn-no-scraper?fpr=data)
+[Finn No Scraper](https://apify.com/santamaria-automations/finn-no-scraper?fpr=data)
 
-# FINN.no Scraper
+# Finn.no Scraper
 
-![FINN.no Scraper](https://images.apifyusercontent.com/aGRiFUN4iEB3oL0AlwxDKBIoGtjIiYlfI4fIYpfmP08/w:1800/cb:1/aHR0cHM6Ly9pLmltZ3VyLmNvbS9HVkZuZ3VOLnBuZw.webp)
+Scrape listings from [finn.no](https://www.finn.no), Norway's largest classifieds platform and job board (Schibsted group). Supports marketplace, jobs, real estate, cars, and mobility.
 
-Scrape structured job listings from [FINN.no](https://www.finn.no/job) — Norway. 30,000+ active listings. No API key required.
+## How it works
 
----
+1. Go to [finn.no](https://www.finn.no) and set up your search with all desired filters (category, price, location, make, model, etc.)
+2. Copy the URL from your browser
+3. Paste it into the **Search URLs** input
+4. Run the actor
 
-## Why this scraper?
+The actor extracts all listings matching your search, with automatic pagination.
 
-### 🇳🇴 Norway's #1 job platform
+## Use with AI Agents (MCP)
 
-FINN.no is Norway's leading marketplace, with the largest selection of Norwegian job listings across all sectors and regions.
+Connect this actor to any MCP-compatible AI client — Claude Desktop, Claude.ai, Cursor, VS Code, LangChain, LlamaIndex, or custom agents.
 
-### 📄 Full job descriptions
-
-Enable `fetchDetails` to retrieve complete job descriptions in all three formats.
-
-### 💰 NOK salary data
-
-Salary ranges parsed in Norwegian Krone where published.
-
-### 🔄 Repost detection
-
-Cross-run deduplication with a 90-day TTL. Use `skipReposts: true` for new-only feeds.
-
-### 🔗 Direct URL scraping
-
-Supply specific FINN.no search or category URLs via `startUrls`.
-
-### ⚙️ No API key required
-
-Runs without any third-party credentials.
-
----
-
-## Input parameters
-
-| Parameter | Type | Description | Default |
-| --- | --- | --- | --- |
-| `searchQuery` | string | Job title, keyword, or skill to search for. | — |
-| `maxResults` | integer | Maximum number of results to return. | `5` |
-| `fetchDetails` | boolean | Fetch full job description from each listing detail page. Disable for faster list-only results. | `true` |
-| `daysOld` | integer | Only return listings published within the last N days. | — |
-| `skipReposts` | boolean | Skip listings already seen in previous runs (90-day deduplication window). | `false` |
-| `startUrls` | array | List of specific URLs to scrape. Bypasses the search input. | — |
-
----
-
-## Output schema
-
-Each result contains the following fields.
-
-**Always present:**
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `id` | string | Unique job listing ID from the source platform. |
-| `url` | string | Direct URL to the job listing. |
-| `title` | string | Job title as published. |
-| `company` | string | Employer / company name. |
-| `location` | string | Full location string as published. |
-| `city` | string | City of the work location. |
-| `country` | string | Country code (ISO 3166-1 alpha-2). |
-| `contractType` | string | Contract type (permanent, contract, temporary, etc.). |
-| `workSchedule` | string | Work schedule (full-time, part-time, etc.). |
-| `salaryMin` | number | Minimum salary (null if not published by employer). |
-| `salaryMax` | number | Maximum salary (null if not published by employer). |
-| `salaryCurrency` | string | ISO 4217 currency code (null if no salary published). |
-| `salaryPeriod` | string | Salary period: YEAR / MONTH / WEEK / DAY / HOUR. |
-| `publishDate` | string | Publication date (YYYY-MM-DD). |
-| `publishDateISO` | string | Publication date in ISO 8601 format. |
-| `source` | string | Source domain name. |
-| `scrapedAt` | string | ISO 8601 timestamp of when this item was scraped. |
-| `contentHash` | string | MD5 hash of key fields for change detection (16 chars). |
-| `summary` | string | Human-readable one-line summary of the listing. |
-| `changeStatus` | string | Change status: NEW / MODIFIED / UNCHANGED. |
-| `isRepost` | boolean | True if this listing was seen in a previous run (90-day window). |
-| `originalPublishDate` | string | Original publish date if this is a repost (null otherwise). |
-| `originalUrl` | string | Original URL if this is a repost (null otherwise). |
-
-**With `fetchDetails: true` (default):**
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `descriptionHtml` | string | Full job description as raw HTML (null if fetchDetails is false). |
-| `descriptionText` | string | Full job description as plain text (null if fetchDetails is false). |
-| `descriptionMarkdown` | string | Full job description in Markdown format (null if fetchDetails is false). |
-
-**Example output record:**
+**Apify MCP server URL:**
 
 ```
-{
-  "id": "123456",
-  "url": "https://www.finn.no/job/jobs/senior-developer/123456",
-  "title": "Senior Software Engineer",
-  "company": "Telenor",
-  "location": "Oslo",
-  "city": "Oslo",
-  "country": "NO",
-  "contractType": "Permanent",
-  "workSchedule": "Full-time",
-  "salaryMin": 400000,
-  "salaryMax": 540000,
-  "salaryCurrency": "NOK",
-  "salaryPeriod": "YEAR",
-  "publishDate": "2026-04-15",
-  "publishDateISO": "2026-04-15",
-  "source": "finn.no",
-  "scrapedAt": "2026-04-24T09:00:00.000Z",
-  "contentHash": "a3f1b2c4d5e67890",
-  "summary": "Senior Software Engineer · Telenor · Oslo",
-  "changeStatus": "NEW",
-  "isRepost": false,
-  "originalPublishDate": null,
-  "originalUrl": null,
-  "descriptionHtml": "<p>We are looking for an experienced professional to join our growing team...</p>",
-  "descriptionText": "We are looking for an experienced professional to join our growing team...",
-  "descriptionMarkdown": "We are looking for an experienced professional to join our growing team..."
-}
+https://mcp.apify.com?tools=santamaria-automations/finn-no-scraper
 ```
 
----
+**Example prompt once connected:**
+
+> "Use `finn-no-scraper` to scrape company data from finn no. Return results as a table."
+
+Clients that support dynamic tool discovery (Claude.ai, VS Code) will receive the full input schema automatically via `add-actor`.
+
+## Features
+
+- **Any filter combination** -- Whatever you can filter on finn.no, the actor can scrape
+- **Multiple searches** -- Paste multiple URLs to run several searches in one run
+- **Detail enrichment** -- Optionally get full description, company URL, employment type (jobs)
+- **All verticals** -- Marketplace (Torget), Jobs (Jobb), Real Estate (Eiendom), Cars (Bil), Mobility
+- **Fast & cheap** -- HTTP-only, 128 MB, pay-per-result
+
+## Output
+
+| Field | Description | Source |
+| --- | --- | --- |
+| `title` | Listing title | Search |
+| `price` / `currency` | Price in NOK | Search |
+| `location` | City or address | Search |
+| `category` | Detected vertical (marketplace/jobs/cars/realestate) | Search |
+| `company_name` | Employer (jobs) or seller | Search |
+| `company_url` | Employer website | Detail |
+| `employment_type` | FULL_TIME, PART_TIME, etc. (jobs) | Detail |
+| `image_url` | Primary image URL | Search |
+| `description` | Full listing description | Detail |
+| `posted_at` / `expires_at` | Publication and expiry dates | Both |
+| `source_url` | Direct link on finn.no | Both |
+
+## Pricing
+
+No start fee -- pay only for results:
+
+| Event | Cost |
+| --- | --- |
+| Listing (basic) | $0.003 |
+| Listing (with details) | $0.005 |
+
+**100 listings = $0.30** (basic) or **$0.50** (with details)
 
 ## Examples
 
-### 1 — Search for Senior Software Engineer roles in Oslo
+### Cars under 200K NOK
 
 ```
 {
-  "searchQuery": "utvikler",
-  "maxResults": 100
-}
-```
-
-### 2 — All listings without filters
-
-```
-{
-  "searchQuery": "",
-  "maxResults": 500
-}
-```
-
-### 3 — Scrape a specific search page directly via startUrls
-
-```
-{
-  "startUrls": [
-    {
-      "url": "https://www.finn.no/job/jobs?q=utvikler"
-    }
-  ],
+  "searchUrls": ["https://www.finn.no/mobility/search/car?price_to=200000&registration_class=1&variant=0.801"],
   "maxResults": 50
 }
 ```
 
-### 4 — Daily feed — new listings only, past 24 hours, no reposts
+### Multiple searches in one run
 
 ```
 {
-  "searchQuery": "",
-  "fetchDetails": false,
-  "daysOld": 1,
-  "skipReposts": true,
-  "maxResults": 1000
+  "searchUrls": [
+    "https://www.finn.no/bap/forsale/search.html?q=iphone",
+    "https://www.finn.no/job/search?q=utvikler",
+    "https://www.finn.no/realestate/homes/search.html?q=leilighet"
+  ],
+  "maxResults": 200,
+  "maxResultsPerQuery": 80
 }
 ```
 
----
+### Quick SERP-only scan (fast, less data)
 
-## 💰 Pricing
+```
+{
+  "searchUrls": ["https://www.finn.no/bap/forsale/search.html?q=macbook"],
+  "maxResults": 200,
+  "includeDetails": false
+}
+```
 
-**$1.50 per 1,000 results** — you only pay for successfully retrieved listings.
-Failed retries and filtered reposts are never charged.
+## Related Actors
 
-| Results | Cost |
-| --- | --- |
-| 100 | ~$0.15 |
-| 1,000 | ~$1.50 |
-| 10,000 | ~$15.00 |
-| 100,000 | ~$150.00 |
+**European Classifieds**
 
-> Flat-rate alternatives typically charge $29–$49/month regardless of usage.
+- [Blocket.se Scraper — Sweden](https://apify.com/santamaria-automations/blocket-se-scraper)
+- [DBA.dk Scraper — Denmark](https://apify.com/santamaria-automations/dba-dk-scraper)
+- [Tori.fi Scraper — Finland](https://apify.com/santamaria-automations/tori-fi-scraper)
+- [Marktplaats.nl Scraper — Netherlands](https://apify.com/santamaria-automations/marktplaats-nl-scraper)
+- [Kleinanzeigen.de Scraper — Germany](https://apify.com/santamaria-automations/kleinanzeigen-de-scraper)
 
-Use the **Max results** cap in the input to control your spend exactly.
+**Real Estate**
 
----
+- [Homegate.ch Scraper — Swiss real estate](https://apify.com/santamaria-automations/homegate-scraper)
+- [Immowelt.de Scraper — German real estate](https://apify.com/santamaria-automations/immowelt-de-scraper)
 
-## Performance
+**Enrich your data**
 
-| Run size | Approx. time |
-| --- | --- |
-| 100 listings | ~2 min |
-| 1,000 listings | ~15 min |
-| 10,000 listings | ~2.5 hours |
+- [Website Email & Phone Scraper](https://apify.com/santamaria-automations/website-email-scraper)
+- [Google Maps Scraper](https://apify.com/santamaria-automations/google-maps-scraper)
+- [Website Contact Extractor](https://apify.com/santamaria-automations/website-contact-extractor)
 
----
+## Issues & Feedback
 
-## Known limitations
-
-- **Salary:** Not all employers publish salary information — `salaryMin` and `salaryMax` may be `null`.
-- **fetchDetails:** Setting `fetchDetails: false` returns list-page fields only; description fields will be `null`.
-
----
-
-## Technical details
-
-- **Source:** finn.no — Norway's job market
-- **Memory:** 256 MB
-- **Repost storage:** KeyValueStore `finn-no-job-dedup`, 90-day TTL
-- **Retry:** Automatic retry on network errors, exponential backoff, 3 attempts per request
-
----
-
-## Additional services
-
-Need a custom actor, additional filters, scheduled runs, or integration support?
-Send an email to [info@unfencedgroup.nl](mailto:info@unfencedgroup.nl) — we build on request.
-
----
-
-*Part of the [Unfenced Group](https://apify.com/unfenced-group) European job board scraper portfolio — 50+ job markets covered.*
-*Built by [unfenced-group](https://apify.com/unfenced-group) · Issues? Open a ticket or send a message.*
+Missing something or not working as expected? [Open an issue](https://console.apify.com/actors/It8xIqTEZKIadyNNr/issues) and we'll fix it.
